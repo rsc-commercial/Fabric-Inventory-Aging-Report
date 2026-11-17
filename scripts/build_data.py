@@ -509,11 +509,13 @@ def main():
         avg_wk = (effective_demand / 39.0) if effective_demand > 0 else 0.0
         wos = round(d["on_hand_qty"] / avg_wk, 1) if avg_wk > 0 else 999.0
 
+        # 13-week (one quarter) cover window:
+        # under 13 weeks is short, 13 to 26 weeks is balanced, over 26 weeks is long
         status = "High Buffer"
-        if wos < 4.0:
+        if wos < 13.0:
             status = "Low Buffer"
             low_buffer_count += 1
-        elif wos <= 16.0:
+        elif wos <= 26.0:
             status = "Balanced"
             balanced_count += 1
         else:

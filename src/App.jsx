@@ -1,4 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { exportToExcel } from './exportExcel';
+
+const exportLabels = {
+  overview: 'overview report',
+  active_covers: 'active covers catalog',
+  projection: 'stock projection report',
+  explorer: 'batch explorer',
+};
 
 // Currency & number formatting helpers
 const formatCurrency = (val) => {
@@ -395,62 +403,24 @@ export default function App() {
     setActiveCurrentPage(1);
   };
 
-  // Export filtered view to CSV
-  const exportToCSV = () => {
-    const headers = [
-      'Batch Number',
-      'Item Number',
-      'Customer',
-      'Material Group',
-      'Warehouse',
-      'Location',
-      'Physical Inventory',
-      'UOM',
-      'Standard Cost (USD)',
-      'Total Cost (USD)',
-      'Import Duty (12% USD)',
-      'VAT (8% USD)',
-      'Total After Tax (USD)',
-      'Aging Days',
-      'Aging Period',
-      'PO Number',
-      'Supplier Code',
-      'Receive Date',
-      'Manufacturing Date',
-      'Description',
-    ];
-
-    const rows = sortedRecords.map((r) => [
-      `"${r.batch}"`,
-      `"${r.item}"`,
-      `"${r.customer}"`,
-      `"${r.product_group}"`,
-      `"${r.warehouse}"`,
-      `"${r.location}"`,
-      r.qty,
-      `"${r.uom}"`,
-      r.standard_cost,
-      r.total_cost,
-      r.import_duty,
-      r.vat,
-      r.total_after_tax,
-      r.aging_days,
-      `"${r.aging_bucket}"`,
-      `"${r.po}"`,
-      `"${r.supplier}"`,
-      `"${r.receive_date}"`,
-      `"${r.mfg_date}"`,
-      `"${(r.description || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
-    ]);
-
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `fabric_inventory_aging_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  // Export the current page dataset as a formatted .xlsx workbook
+  const [exporting, setExporting] = useState(false);
+  const handleExport = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      if (activeTab === 'overview') {
+        await exportToExcel('overview', { data, kpis, agingTierData, customerRiskData });
+      } else if (activeTab === 'active_covers') {
+        await exportToExcel('active_covers', { data, covers: sortedActiveCovers, kpis: activeKPIs });
+      } else if (activeTab === 'projection') {
+        await exportToExcel('projection', { projections: sortedProjections });
+      } else {
+        await exportToExcel('explorer', { records: sortedRecords });
+      }
+    } finally {
+      setExporting(false);
+    }
   };
 
   // Loading State (Antislop R-27)
@@ -760,8 +730,22 @@ export default function App() {
             </button>
           </nav>
 
-          <div className="text-xs font-semibold text-slate-700 px-3 hidden lg:block">
-            {filteredRecords.length.toLocaleString()} batches in scope
+          <div className="flex items-center gap-3 px-1">
+            <div className="text-xs font-semibold text-slate-700 hidden lg:block">
+              {filteredRecords.length.toLocaleString()} batches in scope
+            </div>
+            <button
+              type="button"
+              onClick={handleExport}
+              disabled={exporting}
+              className="px-3 py-2 text-xs font-bold rounded-lg bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 shadow-2xs transition-colors flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-wait whitespace-nowrap"
+              aria-label={`Export ${exportLabels[activeTab]} as Excel workbook`}
+            >
+              <svg className="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              {exporting ? 'Preparing...' : 'Export Excel'}
+            </button>
           </div>
         </div>
 
@@ -988,8 +972,8 @@ export default function App() {
                   <span className="text-xs font-semibold text-slate-500">High</span>
                 </div>
                 <div className="mt-1 flex items-center justify-between text-xs text-slate-600">
-                  <span>Low Buffer Threshold:</span>
-                  <span className="font-semibold text-red-700 tabular-nums">&lt; 4 Weeks Supply</span>
+                  <span>Buffer Bands:</span>
+                  <span className="font-semibold text-slate-700 tabular-nums">Low &lt;13w / Bal 13-26w / High &gt;26w</span>
                 </div>
               </div>
             </div>
