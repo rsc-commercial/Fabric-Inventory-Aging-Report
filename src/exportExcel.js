@@ -127,9 +127,9 @@ function buildOverviewWorkbook(ExcelJS, { data, kpis, agingTierData, customerRis
     ['Physical Volume (Units)', kpis.totalQty, QTY],
     ['Import Duty (12%)', kpis.totalDuty, CURRENCY],
     ['VAT (8%)', kpis.totalVat, CURRENCY],
-    ['Total Financial Liability (Post-Tax)', kpis.totalTax, CURRENCY],
+    ['Total Financial Liability (Included-Tax)', kpis.totalTax, CURRENCY],
     ['Aged Stock Standard Cost (>180 Days)', kpis.agedCostOver180, CURRENCY],
-    ['Aged Liability Post-Tax (>180 Days)', kpis.agedTaxOver180, CURRENCY],
+    ['Aged Liability Included-Tax (>180 Days)', kpis.agedTaxOver180, CURRENCY],
     ['Aged Share of Stock', kpis.agedCostPct, PCT],
   ];
   summaryRows.forEach(([label, value, fmt]) => {
@@ -212,7 +212,7 @@ function buildActiveCoversWorkbook(ExcelJS, { data, covers, kpis }) {
     { header: 'On-Hand Qty', key: 'on_hand_qty', width: 14, numFmt: QTY, align: 'right' },
     { header: 'Batches', key: 'batches_count', width: 10, numFmt: INT, align: 'right' },
     { header: 'Stock Value', key: 'total_cost', width: 15, numFmt: CURRENCY, align: 'right' },
-    { header: 'Post-Tax Value', key: 'total_after_tax', width: 15, numFmt: CURRENCY, align: 'right' },
+    { header: 'Included-Tax Value', key: 'total_after_tax', width: 15, numFmt: CURRENCY, align: 'right' },
     { header: '2026 Consumed Qty', key: 'consumed_qty_2026', width: 17, numFmt: QTY, align: 'right' },
     { header: 'Production Orders', key: 'prod_orders_count', width: 16, numFmt: INT, align: 'right' },
     { header: 'Last Production Pick', key: 'last_consumed_date', width: 19, align: 'left' },
@@ -234,7 +234,7 @@ function buildActiveCoversWorkbook(ExcelJS, { data, covers, kpis }) {
     '',
     `Materials in this export: ${covers.length.toLocaleString()}`,
     `Stock value: $${kpis.totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-    `Post-tax liability: $${kpis.totalTax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+    `Included-Tax liability: $${kpis.totalTax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
   ].forEach((line) => {
     const row = notes.addRow([line]);
     row.getCell(1).font = line.includes(':') ? BODY_FONT : { ...BODY_FONT, size: 10 };
@@ -262,7 +262,7 @@ function buildProjectionWorkbook(ExcelJS, { projections }) {
     { header: 'Balance', key: 'balance', width: 14, numFmt: QTY, align: 'right' },
     { header: 'Free Stock', key: 'free_stock', width: 14, numFmt: QTY, align: 'right' },
     { header: 'Free Stock Value', key: 'free_stock_cost', width: 16, numFmt: CURRENCY, align: 'right' },
-    { header: 'Free Stock Post-Tax', key: 'free_stock_tax', width: 18, numFmt: CURRENCY, align: 'right' },
+    { header: 'Free Stock Included-Tax', key: 'free_stock_tax', width: 18, numFmt: CURRENCY, align: 'right' },
     { header: 'AWS (Weeks)', key: 'aws', width: 12, align: 'right' },
     { header: 'Status', key: 'status', width: 13, align: 'left' },
   ];

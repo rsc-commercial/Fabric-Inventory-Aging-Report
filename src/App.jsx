@@ -505,7 +505,7 @@ export default function App() {
           <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
             <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
               <span>Total Financial Liability</span>
-              <span className="text-[11px] font-normal text-slate-400">Post-Tax</span>
+              <span className="text-[11px] font-normal text-slate-400">Included-Tax</span>
             </div>
             <div className="mt-2 text-2xl font-bold text-blue-900 tabular-nums">
               {formatCurrency(kpis.totalTax)}
@@ -911,7 +911,7 @@ export default function App() {
               <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
                 <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
                   <span>Active Tax Liability</span>
-                  <span className="text-[11px] font-normal text-slate-400">Post-Tax</span>
+                  <span className="text-[11px] font-normal text-slate-400">Included-Tax</span>
                 </div>
                 <div className="mt-2 text-2xl font-bold text-blue-900 tabular-nums">
                   {formatCurrency(activeKPIs.totalTax)}
@@ -1087,7 +1087,7 @@ export default function App() {
                         Stock Value {activeSortField === 'total_cost' && (activeSortOrder === 'asc' ? '↑' : '↓')}
                       </th>
                       <th onClick={() => handleActiveSort('total_after_tax')} className="py-2.5 px-3 text-right cursor-pointer hover:bg-slate-200/60">
-                        Post-Tax Value {activeSortField === 'total_after_tax' && (activeSortOrder === 'asc' ? '↑' : '↓')}
+                        Included-Tax Value {activeSortField === 'total_after_tax' && (activeSortOrder === 'asc' ? '↑' : '↓')}
                       </th>
                       <th onClick={() => handleActiveSort('consumed_qty_2026')} className="py-2.5 px-3 text-right cursor-pointer hover:bg-slate-200/60">
                         2026 Consumed {activeSortField === 'consumed_qty_2026' && (activeSortOrder === 'asc' ? '↑' : '↓')}
@@ -1400,10 +1400,10 @@ export default function App() {
                       <th
                         onClick={() => handleProjSort('free_stock_tax')}
                         className="py-2.5 px-3 text-right font-bold text-blue-950 cursor-pointer hover:bg-slate-200/70 transition-colors group"
-                        title="Click to sort by Post-Tax Liability"
+                        title="Click to sort by Included-Tax Liability"
                       >
                         <span className="inline-flex items-center gap-1 justify-end">
-                          Post-Tax Liability
+                          Included-Tax Liability
                           <span className={projSortField === 'free_stock_tax' ? 'text-blue-900 font-bold' : 'text-slate-300 group-hover:text-slate-500'}>
                             {projSortField === 'free_stock_tax' ? (projSortOrder === 'asc' ? '↑' : '↓') : '↕'}
                           </span>
@@ -1622,7 +1622,7 @@ export default function App() {
                         VAT (8%)
                       </th>
                       <th onClick={() => handleSort('total_after_tax')} className="py-2.5 px-3 text-right cursor-pointer hover:bg-slate-200/60">
-                        Post-Tax Total {sortField === 'total_after_tax' && (sortOrder === 'asc' ? '↑' : '↓')}
+                        Included-Tax Total {sortField === 'total_after_tax' && (sortOrder === 'asc' ? '↑' : '↓')}
                       </th>
                       <th onClick={() => handleSort('aging_days')} className="py-2.5 px-3 text-center cursor-pointer hover:bg-slate-200/60">
                         Aging {sortField === 'aging_days' && (sortOrder === 'asc' ? '↑' : '↓')}
@@ -1787,7 +1787,7 @@ export default function App() {
                   <div className="font-semibold text-slate-800 tabular-nums">+{formatCurrency(inspectedBatch.vat)}</div>
                 </div>
                 <div>
-                  <div className="text-blue-900 font-medium">Post-Tax Liability</div>
+                  <div className="text-blue-900 font-medium">Included-Tax Liability</div>
                   <div className="font-bold text-blue-950 tabular-nums">{formatCurrency(inspectedBatch.total_after_tax)}</div>
                 </div>
               </div>
@@ -1886,7 +1886,7 @@ export default function App() {
               </div>
 
               <div className="p-3 bg-blue-50/60 rounded-lg border border-blue-200">
-                <div className="text-blue-900 font-medium">Post-Tax Liability</div>
+                <div className="text-blue-900 font-medium">Included-Tax Liability</div>
                 <div className="text-base font-bold text-blue-950 mt-1 tabular-nums">
                   {formatCurrency(inspectedActiveCover.total_after_tax)}
                 </div>
