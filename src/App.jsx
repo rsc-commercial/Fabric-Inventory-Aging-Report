@@ -67,7 +67,7 @@ export default function App() {
   const [activeSortOrder, setActiveSortOrder] = useState('desc');
   const [activeCurrentPage, setActiveCurrentPage] = useState(1);
   const [activePageSize, setActivePageSize] = useState(25);
-  const [activeStatusFilter, setActiveStatusFilter] = useState('ALL'); // 'ALL' | 'Low Buffer' | 'Balanced' | 'High Buffer'
+  const [activeStatusFilter, setActiveStatusFilter] = useState('ALL'); // 'ALL' | 'Low Buffer'
   const [inspectedActiveCover, setInspectedActiveCover] = useState(null);
 
   // Modal inspection
@@ -291,16 +291,12 @@ export default function App() {
     const totalTax = filteredActiveCovers.reduce((sum, c) => sum + c.total_after_tax, 0);
     const totalOrders2026 = filteredActiveCovers.reduce((sum, c) => sum + c.order_units_2026, 0);
     const lowBufferCount = filteredActiveCovers.filter((c) => c.status === 'Low Buffer').length;
-    const balancedCount = filteredActiveCovers.filter((c) => c.status === 'Balanced').length;
-    const highBufferCount = filteredActiveCovers.filter((c) => c.status === 'High Buffer').length;
     return {
       totalItems,
       totalCost,
       totalTax,
       totalOrders2026,
       lowBufferCount,
-      balancedCount,
-      highBufferCount,
     };
   }, [filteredActiveCovers]);
 
@@ -961,19 +957,12 @@ export default function App() {
                   <span>Runway &amp; Buffer Health</span>
                   <span className="text-[11px] font-normal text-slate-400">Weeks of Supply</span>
                 </div>
-                <div className="mt-2 text-2xl font-bold text-slate-900 tabular-nums flex items-baseline gap-2">
-                  <span className="text-red-700">{activeKPIs.lowBufferCount}</span>
-                  <span className="text-xs font-semibold text-slate-500">Low</span>
-                  <span className="text-slate-300">/</span>
-                  <span className="text-emerald-700">{activeKPIs.balancedCount}</span>
-                  <span className="text-xs font-semibold text-slate-500">Bal</span>
-                  <span className="text-slate-300">/</span>
-                  <span className="text-sky-700">{activeKPIs.highBufferCount}</span>
-                  <span className="text-xs font-semibold text-slate-500">High</span>
+                <div className="mt-2 text-2xl font-bold text-slate-900 tabular-nums">
+                  {activeKPIs.lowBufferCount} <span className="text-sm font-semibold text-red-700">materials below 13 weeks</span>
                 </div>
                 <div className="mt-1 flex items-center justify-between text-xs text-slate-600">
-                  <span>Buffer Bands:</span>
-                  <span className="font-semibold text-slate-700 tabular-nums">Low &lt;13w / Bal 13-26w / High &gt;26w</span>
+                  <span>Threshold:</span>
+                  <span className="font-semibold text-slate-700 tabular-nums">Under 13 weeks of supply</span>
                 </div>
               </div>
             </div>
@@ -1062,30 +1051,6 @@ export default function App() {
                   >
                     <span className="w-2 h-2 rounded-full bg-red-600 inline-block"></span>
                     Low Buffer ({activeKPIs.lowBufferCount})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setActiveStatusFilter('Balanced'); setActiveCurrentPage(1); }}
-                    className={`px-3 py-1 rounded-md font-semibold transition-colors flex items-center gap-1.5 ${
-                      activeStatusFilter === 'Balanced'
-                        ? 'bg-emerald-800 text-white shadow-2xs'
-                        : 'bg-emerald-50 text-emerald-900 border border-emerald-200 hover:bg-emerald-100'
-                    }`}
-                  >
-                    <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
-                    Balanced ({activeKPIs.balancedCount})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setActiveStatusFilter('High Buffer'); setActiveCurrentPage(1); }}
-                    className={`px-3 py-1 rounded-md font-semibold transition-colors flex items-center gap-1.5 ${
-                      activeStatusFilter === 'High Buffer'
-                        ? 'bg-sky-800 text-white shadow-2xs'
-                        : 'bg-sky-50 text-sky-900 border border-sky-200 hover:bg-sky-100'
-                    }`}
-                  >
-                    <span className="w-2 h-2 rounded-full bg-sky-600 inline-block"></span>
-                    High Buffer ({activeKPIs.highBufferCount})
                   </button>
                 </div>
               </div>
@@ -1202,9 +1167,7 @@ export default function App() {
                             <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
                               c.status === 'Low Buffer'
                                 ? 'bg-red-100 text-red-900 border border-red-300'
-                                : c.status === 'Balanced'
-                                ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                                : 'bg-sky-100 text-sky-900 border border-sky-300'
+                                : 'bg-slate-100 text-slate-700 border border-slate-300'
                             }`}>
                               {c.status}
                             </span>

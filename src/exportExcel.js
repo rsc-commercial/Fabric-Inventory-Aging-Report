@@ -230,7 +230,7 @@ function buildActiveCoversWorkbook(ExcelJS, { data, covers, kpis }) {
     'Active cover: inventory age 180 days or less AND recorded production consumption or customer orders in 2026.',
     'Consumption source: Dynamics 365 inventory transactions, reference "Production line", issue status Sold or Deducted.',
     'Runway (weeks of supply) = on-hand quantity divided by average weekly consumption across Feb to Oct 2026 (39 weeks).',
-    'Status bands: under 13 weeks is Low Buffer, 13 to 26 weeks is Balanced, above 26 weeks is High Buffer.',
+    'Status: under 13 weeks of supply is flagged Low Buffer. No upper band is set yet, so everything else reads Adequate.',
     '',
     `Materials in this export: ${covers.length.toLocaleString()}`,
     `Stock value: $${kpis.totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,

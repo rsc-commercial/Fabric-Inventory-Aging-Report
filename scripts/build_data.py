@@ -509,8 +509,6 @@ def main():
 
     active_covers = []
     low_buffer_count = 0
-    balanced_count = 0
-    high_buffer_count = 0
 
     for it, d in active_items_map.items():
         # Consumption-based runway (preferred) or order-based runway
@@ -518,17 +516,13 @@ def main():
         avg_wk = (effective_demand / 39.0) if effective_demand > 0 else 0.0
         wos = round(d["on_hand_qty"] / avg_wk, 1) if avg_wk > 0 else 999.0
 
-        # 13-week (one quarter) cover window:
-        # under 13 weeks is short, 13 to 26 weeks is balanced, over 26 weeks is long
-        status = "High Buffer"
-        if wos < 13.0:
-            status = "Low Buffer"
-            low_buffer_count += 1
-        elif wos <= 26.0:
-            status = "Balanced"
-            balanced_count += 1
+        # Only one band is defined: under 13 weeks of cover counts as low.
+        # An upper band needs a supply lead time factor that is not available yet.
+        status = "Low Buffer"
+        if wos >= 13.0:
+            status = "Adequate"
         else:
-            high_buffer_count += 1
+            low_buffer_count += 1
 
         active_covers.append({
             "item": d["item"],
@@ -623,8 +617,7 @@ def main():
                 "total_tax": round(active_tax_total, 2),
                 "cost_pct": round(active_cost_total / total_cost * 100, 1) if total_cost > 0 else 0.0,
                 "low_buffer_count": low_buffer_count,
-                "balanced_count": balanced_count,
-                "high_buffer_count": high_buffer_count,
+                "low_buffer_threshold_weeks": 13,
                 "monthly_velocity": monthly_velocity
             },
             "aging_summary": aging_summary,
