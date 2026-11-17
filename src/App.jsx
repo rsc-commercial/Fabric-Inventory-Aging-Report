@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { exportToExcel } from './exportExcel';
+import MultiSelect from './MultiSelect';
 
 const exportLabels = {
   overview: 'overview report',
@@ -45,10 +46,11 @@ export default function App() {
   // Tab & Filters
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'active_covers' | 'projection' | 'explorer'
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCustomer, setSelectedCustomer] = useState('ALL');
-  const [selectedGroup, setSelectedGroup] = useState('ALL');
-  const [selectedAging, setSelectedAging] = useState('ALL');
-  const [selectedWarehouse, setSelectedWarehouse] = useState('ALL');
+  // Empty array means no restriction on that dimension
+  const [selectedCustomers, setSelectedCustomers] = useState([]);
+  const [selectedGroups, setSelectedGroups] = useState([]);
+  const [selectedAgings, setSelectedAgings] = useState([]);
+  const [selectedWarehouses, setSelectedWarehouses] = useState([]);
 
   // Pagination & Sorting (Explorer Table)
   const [currentPage, setCurrentPage] = useState(1);
@@ -109,10 +111,10 @@ export default function App() {
   const filteredRecords = useMemo(() => {
     if (!data?.records) return [];
     return data.records.filter((r) => {
-      if (selectedCustomer !== 'ALL' && r.customer !== selectedCustomer) return false;
-      if (selectedGroup !== 'ALL' && r.product_group !== selectedGroup) return false;
-      if (selectedAging !== 'ALL' && r.aging_bucket !== selectedAging) return false;
-      if (selectedWarehouse !== 'ALL' && r.warehouse !== selectedWarehouse) return false;
+      if (selectedCustomers.length > 0 && !selectedCustomers.includes(r.customer)) return false;
+      if (selectedGroups.length > 0 && !selectedGroups.includes(r.product_group)) return false;
+      if (selectedAgings.length > 0 && !selectedAgings.includes(r.aging_bucket)) return false;
+      if (selectedWarehouses.length > 0 && !selectedWarehouses.includes(r.warehouse)) return false;
       if (searchQuery.trim() !== '') {
         const q = searchQuery.toLowerCase();
         const matchItem = r.item.toLowerCase().includes(q);
@@ -124,7 +126,7 @@ export default function App() {
       }
       return true;
     });
-  }, [data, selectedCustomer, selectedGroup, selectedAging, selectedWarehouse, searchQuery]);
+  }, [data, selectedCustomers, selectedGroups, selectedAgings, selectedWarehouses, searchQuery]);
 
   // Dynamic KPIs calculated over active filtered scope
   const kpis = useMemo(() => {
@@ -191,7 +193,7 @@ export default function App() {
   const filteredProjections = useMemo(() => {
     if (!data?.projections) return [];
     return data.projections.filter((p) => {
-      if (selectedCustomer !== 'ALL' && p.customer !== selectedCustomer) return false;
+      if (selectedCustomers.length > 0 && !selectedCustomers.includes(p.customer)) return false;
       if (searchQuery.trim() !== '') {
         const q = searchQuery.toLowerCase();
         const matchItem = p.item.toLowerCase().includes(q);
@@ -201,7 +203,7 @@ export default function App() {
       }
       return true;
     });
-  }, [data, selectedCustomer, searchQuery]);
+  }, [data, selectedCustomers, searchQuery]);
 
   // Sorted projections
   const sortedProjections = useMemo(() => {
@@ -239,8 +241,8 @@ export default function App() {
   const filteredActiveCovers = useMemo(() => {
     if (!data?.active_covers) return [];
     return data.active_covers.filter((c) => {
-      if (selectedCustomer !== 'ALL' && c.customer !== selectedCustomer) return false;
-      if (selectedGroup !== 'ALL' && c.product_group !== selectedGroup) return false;
+      if (selectedCustomers.length > 0 && !selectedCustomers.includes(c.customer)) return false;
+      if (selectedGroups.length > 0 && !selectedGroups.includes(c.product_group)) return false;
       if (activeStatusFilter !== 'ALL' && c.status !== activeStatusFilter) return false;
       if (searchQuery.trim() !== '') {
         const q = searchQuery.toLowerCase();
@@ -252,7 +254,7 @@ export default function App() {
       }
       return true;
     });
-  }, [data, selectedCustomer, selectedGroup, activeStatusFilter, searchQuery]);
+  }, [data, selectedCustomers, selectedGroups, activeStatusFilter, searchQuery]);
 
   // Sorted Active Covers
   const sortedActiveCovers = useMemo(() => {
@@ -388,10 +390,10 @@ export default function App() {
 
   // Reset filters
   const resetFilters = () => {
-    setSelectedCustomer('ALL');
-    setSelectedGroup('ALL');
-    setSelectedAging('ALL');
-    setSelectedWarehouse('ALL');
+    setSelectedCustomers([]);
+    setSelectedGroups([]);
+    setSelectedAgings([]);
+    setSelectedWarehouses([]);
     setActiveStatusFilter('ALL');
     setSearchQuery('');
     setCurrentPage(1);
@@ -557,7 +559,7 @@ export default function App() {
               <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
                 Filter &amp; Drill-down Controls
               </span>
-              {(selectedCustomer !== 'ALL' || selectedGroup !== 'ALL' || selectedAging !== 'ALL' || selectedWarehouse !== 'ALL' || searchQuery !== '') && (
+              {(selectedCustomers.length > 0 || selectedGroups.length > 0 || selectedAgings.length > 0 || selectedWarehouses.length > 0 || searchQuery !== '') && (
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-900 border border-blue-200">
                   Active Filter
                 </span>
@@ -580,70 +582,56 @@ export default function App() {
               <label htmlFor="customer-filter" className="block text-xs font-bold text-slate-800 mb-1.5">
                 Customer Account
               </label>
-              <select
+              <MultiSelect
                 id="customer-filter"
-                value={selectedCustomer}
-                onChange={(e) => { setSelectedCustomer(e.target.value); setCurrentPage(1); setProjCurrentPage(1); }}
-                className="w-full text-xs rounded-lg border-2 border-slate-300 hover:border-slate-400 bg-white text-slate-900 font-semibold py-2 px-3 focus:border-blue-700 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-colors shadow-2xs"
-              >
-                <option value="ALL">All Customers ({data.metadata.customers.length})</option>
-                {data.metadata.customers.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
+                label="Customer Account"
+                options={data.metadata.customers}
+                values={selectedCustomers}
+                onChange={(v) => { setSelectedCustomers(v); setCurrentPage(1); setProjCurrentPage(1); setActiveCurrentPage(1); }}
+                allLabel={`All Customers (${data.metadata.customers.length})`}
+              />
             </div>
 
             <div>
               <label htmlFor="group-filter" className="block text-xs font-bold text-slate-800 mb-1.5">
                 Material Group
               </label>
-              <select
+              <MultiSelect
                 id="group-filter"
-                value={selectedGroup}
-                onChange={(e) => { setSelectedGroup(e.target.value); setCurrentPage(1); setProjCurrentPage(1); }}
-                className="w-full text-xs rounded-lg border-2 border-slate-300 hover:border-slate-400 bg-white text-slate-900 font-semibold py-2 px-3 focus:border-blue-700 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-colors shadow-2xs"
-              >
-                <option value="ALL">All Material Groups (3)</option>
-                <option value="RM_FABRIC">Fabric (RM_FABRIC)</option>
-                <option value="RM_LEATHER">Leather (RM_LEATHER)</option>
-                <option value="RM_PU/PVC">PU / PVC (RM_PU/PVC)</option>
-              </select>
+                label="Material Group"
+                options={['RM_FABRIC', 'RM_LEATHER', 'RM_PU/PVC']}
+                values={selectedGroups}
+                onChange={(v) => { setSelectedGroups(v); setCurrentPage(1); setProjCurrentPage(1); setActiveCurrentPage(1); }}
+                allLabel="All Material Groups (3)"
+              />
             </div>
 
             <div>
               <label htmlFor="aging-filter" className="block text-xs font-bold text-slate-800 mb-1.5">
                 Aging Period
               </label>
-              <select
+              <MultiSelect
                 id="aging-filter"
-                value={selectedAging}
-                onChange={(e) => { setSelectedAging(e.target.value); setCurrentPage(1); setProjCurrentPage(1); }}
-                className="w-full text-xs rounded-lg border-2 border-slate-300 hover:border-slate-400 bg-white text-slate-900 font-semibold py-2 px-3 focus:border-blue-700 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-colors shadow-2xs"
-              >
-                <option value="ALL">All Periods (0 to 24+ mos)</option>
-                <option value="0-3 months">0-3 months (0-89 days)</option>
-                <option value="3-6 months">3-6 months (90-179 days)</option>
-                <option value="6-12 months">6-12 months (180-359 days)</option>
-                <option value="12-24 months">12-24 months (360-719 days)</option>
-                <option value="+24 months">+24 months (720+ days)</option>
-              </select>
+                label="Aging Period"
+                options={['0-3 months', '3-6 months', '6-12 months', '12-24 months', '+24 months']}
+                values={selectedAgings}
+                onChange={(v) => { setSelectedAgings(v); setCurrentPage(1); setProjCurrentPage(1); setActiveCurrentPage(1); }}
+                allLabel="All Periods (0 to 24+ mos)"
+              />
             </div>
 
             <div>
               <label htmlFor="warehouse-filter" className="block text-xs font-bold text-slate-800 mb-1.5">
                 Warehouse Location
               </label>
-              <select
+              <MultiSelect
                 id="warehouse-filter"
-                value={selectedWarehouse}
-                onChange={(e) => { setSelectedWarehouse(e.target.value); setCurrentPage(1); setProjCurrentPage(1); }}
-                className="w-full text-xs rounded-lg border-2 border-slate-300 hover:border-slate-400 bg-white text-slate-900 font-semibold py-2 px-3 focus:border-blue-700 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-colors shadow-2xs"
-              >
-                <option value="ALL">All Warehouses ({data.metadata.warehouses.length})</option>
-                {data.metadata.warehouses.map((w) => (
-                  <option key={w} value={w}>{w}</option>
-                ))}
-              </select>
+                label="Warehouse Location"
+                options={data.metadata.warehouses}
+                values={selectedWarehouses}
+                onChange={(v) => { setSelectedWarehouses(v); setCurrentPage(1); setProjCurrentPage(1); setActiveCurrentPage(1); }}
+                allLabel={`All Warehouses (${data.metadata.warehouses.length})`}
+              />
             </div>
 
             <div>
