@@ -19,6 +19,15 @@ import openpyxl
 from datetime import datetime
 from collections import defaultdict
 
+# Locations excluded from the report (per NOTES.md)
+EXCLUDED_LOCATIONS = {
+    "CLM-DONE",
+    "CLM-PEND",
+    "P4-15",
+    "RM1-DEFECT",
+    "UPH WIP",
+}
+
 def parse_date(val):
     if val is None:
         return ""
@@ -276,7 +285,7 @@ def main():
 
         loc = str(row[5]).strip() if row[5] else ""
         loc_upper = loc.upper()
-        if "DEFECT" in loc_upper or loc_upper == "UPH WIP":
+        if loc_upper in EXCLUDED_LOCATIONS:
             continue
 
         batch = str(row[0]).strip() if row[0] else ""

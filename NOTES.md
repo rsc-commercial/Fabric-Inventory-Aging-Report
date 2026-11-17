@@ -12,7 +12,17 @@ Monthly fabric stock and liability
 
 - ITEMNUMBER: Starting with LH (-01,-03,-07) -> ignore the rest
 
-- LOCATION: Filter out ...-DEFECT; UPH WIP
+- LOCATION: Filter out the following locations (highlighted in yellow in the source list)
+
+  | Location |
+  |---|
+  | CLM-DONE |
+  | CLM-PEND |
+  | P4-15 |
+  | RM1-DEFECT |
+  | UPH WIP |
+
+  Keep the rest: CSBE, DUMMY P2, FGUP_PD, InternalTE, PDFIN, RM-01, RM1, RM1-COM, RM1LH-DISP, RM2
 
 - QTY for Report: Take column PHYSICALINVENTORY
 
