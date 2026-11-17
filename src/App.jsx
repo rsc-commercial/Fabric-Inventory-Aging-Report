@@ -462,7 +462,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
       {/* Top Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-md bg-slate-900 text-white flex items-center justify-center font-bold text-sm tracking-wider border border-slate-800 shadow-2xs">
               RSC
@@ -487,7 +487,7 @@ export default function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1 flex flex-col gap-6">
+      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1 flex flex-col gap-6">
         {/* KPI Cards */}
         <section aria-label="Key Performance Indicators" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
@@ -668,7 +668,7 @@ export default function App() {
 
         {/* Tab Selection */}
         <div className="bg-slate-200/90 p-1.5 rounded-xl border border-slate-300 shadow-inner flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
-          <nav className="flex flex-wrap gap-1.5" aria-label="Dashboard Views">
+          <nav className="flex flex-wrap gap-1.5 min-w-0" aria-label="Dashboard Views">
             <button
               type="button"
               onClick={() => setActiveTab('overview')}
@@ -1999,7 +1999,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-4 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
           <div>
             Rochdale Spears Company &middot; Supply Chain &amp; Manufacturing Operations &middot; Fabric Stock &amp; Aging Control
           </div>
